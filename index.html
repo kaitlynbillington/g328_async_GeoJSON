@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Load data from an external GeoJSON file</title>
+    <title>Universities in Washington State</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
@@ -27,6 +27,7 @@
 
         #map {
             flex-grow: 1;
+
         }
 
         button {
@@ -55,15 +56,17 @@
     <main id="container">
         <div id="table">
 
-            <h2>Earthquake List</h2>
-            <button onclick="sortTable()">Sort by Magnitude</button>
+            <h2>Universities in Washington State</h2>
+            <button onclick="sortTable()">Sort by Student Population</button>
             
 
             <table>
                 <tr>
-                    <th>id</th>
-                    <th>magnitude</th>
-                    <th>timestamp</th>
+                    <th>Name</th>
+                    <th>Year Founded</th>
+                    <th>Type</th>
+                    <th>Student Population</th>
+                    <th>Location</th>
                 </tr>
             </table>
 
@@ -72,114 +75,82 @@
 
     </main>
     <script>
-        mapboxgl.accessToken =
-            'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
+        mapboxgl.accessToken = 'pk.eyJ1Ijoia2FpdGx5bmJpbGxpbmd0b24iLCJhIjoiY21oY2IzaDY3MDI2bjJpcHo3dTdndnp6OSJ9.CuU9C3o9uwHfnGBccy5s_A';
         const map = new mapboxgl.Map({
             container: 'map', // container ID
             style: 'mapbox://styles/mapbox/satellite-v9', // style URL
-            zoom: 5.5, // starting zoom
-            center: [138.043, 38] // starting center
+            zoom: 5.0, // starting zoom
+            center: [-120.31, 47.42] // starting center: Washington State
         });
 
 
         async function geojsonFetch() {
 
+            // fetch geojson
+            let response, wa_uni, WA_County_Boudaries, table;
+                response = await fetch('assets/wa_uni.geojson');
+                wa_uni = await response.json();
+                response = await fetch('assets/WA_County_Boundaries.geojson');
+                WA_County_Boundaries = await response.json();
 
-            let response = await fetch('assets/earthquakes.geojson');
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            let earthquakes = await response.json();
-
-
-            response = await fetch('assets/japan.json');
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            let japan = await response.json();
-
-
-            var table = document.getElementsByTagName("table");
-            for (let i = 0; i < earthquakes.features.length; i++) {
-                // console.log(earthquakes.features[i].properties.id);
-
-                var lng = await earthquakes.features[i].geometry.coordinates[0];
-                var lat = await earthquakes.features[i].geometry.coordinates[1];
-
-                // Create an empty <tr> element and add it to the 1st position of the table:
-                var row = table[0].insertRow(-1);
-
-                var cell1 = row.insertCell(0);
-                var cell2 = row.insertCell(1);
-                var cell3 = row.insertCell(2);
-                cell1.innerHTML = await earthquakes.features[i].properties.id;
-                cell2.innerHTML = await earthquakes.features[i].properties.mag;
-                cell3.innerHTML = await new Date(earthquakes.features[i].properties.time).toLocaleDateString("en-US");
-
-            }
+                // generate the table
+                table = document.getElementsByTagName("table")[0];
+                let row, cell1, cell2, cell3, cell4, cell5;
+                for (let i = 0; i < wa_uni.features.length; i++) {
+                    // Create an empty <tr> element and add it to the 1st position of the table:
+                    row = table.insertRow(-1);
+                    cell1 = row.insertCell(0);
+                    cell2 = row.insertCell(1);
+                    cell3 = row.insertCell(2);
+                    cell4 = row.insertCell(3);
+                    cell5 = row.insertCell(4);
+                    cell1.innerHTML = wa_uni.features[i].properties.name;
+                    cell2.innerHTML = wa_uni.features[i].properties.year_founded;
+                    cell3.innerHTML = wa_uni.features[i].properties.type;
+                    cell4.innerHTML = wa_uni.features[i].properties.student_population;
+                    cell5.innerHTML = wa_uni.features[i].properties.county;
+                }
 
 
+                // load data to the map as new layers and table on the side.
+                map.on('load', function loadingData() {
 
-
-            map.on('load', () => {
-
-
-
-                map.addSource('earthquakes', {
+                map.addSource('wa_uni', {
                     type: 'geojson',
-                    data: earthquakes
+                    data: wa-uni
                 });
 
                 map.addLayer({
-                    'id': 'earthquakes-layer',
+                    'id': 'wa_uni-layer',
                     'type': 'circle',
-                    'source': 'earthquakes',
+                    'source': 'wa_uni',
                     'paint': {
                         'circle-radius': 8,
                         'circle-stroke-width': 2,
-                        'circle-color': 'red',
+                        'circle-color': 'blue',
                         'circle-stroke-color': 'white'
                     }
                 });
 
 
-                map.addSource('japan', {
+                map.addSource('WA_County_Boundaries', {
                     type: 'geojson',
-                    data: japan
+                    data: WA_County_Boundaries
                 });
 
                 map.addLayer({
-                    'id': 'japan-layer',
+                    'id': 'WA_County_Boundaries-layer',
                     'type': 'fill',
-                    'source': 'japan',
+                    'source': 'WA_County_Boundaries',
                     'paint': {
-                        'fill-color': '#0080ff', // blue color fill
+                        'fill-color': '#D3D3D3', // grey color fill
                         'fill-opacity': 0.5
                     }
                 });
+                });
+            }
 
-
-
-
-
-
-            });
-
-
-
-
-        }
-
-        geojsonFetch()
-            .catch(e => {
-                console.log('There has been a problem with your fetch operation: ' + e.message);
-            });
-
-
+            geojsonFetch();
 
         function sortTable() {
             var table, rows, switching, i, x, y, shouldSwitch;
@@ -215,6 +186,8 @@
                 }
             }
         }
+
+
     </script>
 
 </body>
