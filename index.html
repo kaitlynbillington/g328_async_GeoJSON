@@ -27,7 +27,7 @@
 
         #map {
             flex-grow: 1;
-
+            /* map coverng the full screen */
         }
 
         button {
@@ -48,6 +48,13 @@
 
         tr:nth-child(even) {
             background-color: #f2f2f2;
+        }
+
+        /* Remove sidepanel when screen is less than 1024px*/
+        @media (max-width: 1024px) {
+            #table {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -115,9 +122,10 @@
                 // load data to the map as new layers and table on the side.
                 map.on('load', function loadingData() {
 
+                // add universities layer
                 map.addSource('wa_uni', {
                     type: 'geojson',
-                    data: wa-uni
+                    data: wa_uni
                 });
 
                 map.addLayer({
@@ -132,7 +140,7 @@
                     }
                 });
 
-
+                // add county boundaries layer
                 map.addSource('WA_County_Boundaries', {
                     type: 'geojson',
                     data: WA_County_Boundaries
@@ -148,7 +156,7 @@
                     }
                 });
                 });
-            }
+        }
 
             geojsonFetch();
 
