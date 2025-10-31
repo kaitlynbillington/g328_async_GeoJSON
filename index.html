@@ -85,7 +85,7 @@
         mapboxgl.accessToken = 'pk.eyJ1Ijoia2FpdGx5bmJpbGxpbmd0b24iLCJhIjoiY21oY2IzaDY3MDI2bjJpcHo3dTdndnp6OSJ9.CuU9C3o9uwHfnGBccy5s_A';
         const map = new mapboxgl.Map({
             container: 'map', // container ID
-            style: 'mapbox://styles/mapbox/satellite-v9', // style URL
+            style: 'mapbox://styles/mapbox/streets-v12', // style URL
             zoom: 5.0, // starting zoom
             center: [-120.31, 47.42] // starting center: Washington State
         });
@@ -151,7 +151,7 @@
                     'type': 'fill',
                     'source': 'WA_County_Boundaries',
                     'paint': {
-                        'fill-color': '#D3D3D3', // grey color fill
+                        'fill-color': '#333333', // dark grey color fill
                         'fill-opacity': 0.5
                     }
                 });
@@ -177,8 +177,8 @@
                     shouldSwitch = false;
                     /*Get the two elements you want to compare,
                     one from current row and one from the next:*/
-                    x = parseFloat(rows[i].getElementsByTagName("td")[1].innerHTML);
-                    y = parseFloat(rows[i + 1].getElementsByTagName("td")[1].innerHTML);
+                    x = parseFloat(rows[i].getElementsByTagName("td")[3].innerHTML);
+                    y = parseFloat(rows[i + 1].getElementsByTagName("td")[3].innerHTML);
                     //check if the two rows should switch place:
                     if (x < y) {
                         //if so, mark as a switch and break the loop:
